@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <slot />
+    <h1>waiting List</h1>
   </div>
 </template>
 
