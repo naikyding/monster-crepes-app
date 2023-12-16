@@ -1,23 +1,39 @@
 <script setup>
-const route = useRoute();
-// const searchMobile = route.query.mobile;
+import { useForm, useField } from "vee-validate";
 
-const searchMobile = ref(null);
 const dialogModelRef = ref(null);
+const mobileValue = ref(null);
 
-onMounted(() => {
-  // console.log(dialogModelRef.value.showModal());
+const { values, errors, defineField } = useForm();
+
+const {
+  value: mobileNumber,
+  meta,
+  errorMessage,
+} = useField("mobileLastThreeNumber", (value) => {
+  if (!value) {
+    return "手機未三碼必填";
+  }
+  if (value.length < 3) {
+    return "手機未三碼不足 3 位數";
+  }
+  if (value.length > 3) {
+    return "手機未三碼超過 3 位數";
+  }
+  return true;
 });
-
-function reSearch() {
-  searchMobile.value = null;
-  dialogModelRef.value.showModal();
-}
 </script>
 
 <template>
   <div class="w-auto h-[100dvh] flex justify-center items-center">
     <div class="text-center">
+      <!-- 輸入未三碼 -->
+      <inputPhoneLastThreeNumber
+        type="tel"
+        v-model="mobileNumber"
+        :errorMessage="errorMessage"
+      />
+      {{ meta.touched }}
       <h1 class="text-2xl font-bold">怪獸可麗餅</h1>
       <p class="flex justify-center">
         竹圍
@@ -43,7 +59,7 @@ function reSearch() {
       </p>
 
       <div class="wait-info py-10">
-        <div v-if="!searchMobile">目前訂單份數:</div>
+        <div v-if="!mobileValue">目前訂單份數:</div>
         <div v-else>您前面等候份數:</div>
         <div class="waiting-quantity text-5xl font-bold">006</div>
         <div>
@@ -52,9 +68,9 @@ function reSearch() {
           分鐘
         </div>
       </div>
-      {{ searchMobile }}
+      {{ mobileValue }}
       <button
-        v-show="!searchMobile"
+        v-show="!mobileValue"
         onclick="my_modal_1.showModal()"
         class="btn btn-outline btn-info"
       >
@@ -89,14 +105,14 @@ function reSearch() {
       <div class="modal-box">
         <h3 class="font-bold text-lg">手機未三碼</h3>
         <p class="py-4">
-          <input
+          <!-- <input
             ref="inputRef"
-            v-model="searchMobile"
+            v-model="mobileValue"
             type="tel"
             placeholder="請輸入手機未三碼"
             class="input input-bordered input-info w-full max-w-xs"
             maxlength="3"
-          />
+          /> -->
         </p>
         <div class="modal-action">
           <form method="dialog">
