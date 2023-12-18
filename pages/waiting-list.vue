@@ -1,39 +1,30 @@
 <script setup>
-import { useForm, useField } from "vee-validate";
-
 const dialogModelRef = ref(null);
-const mobileValue = ref(null);
-
-const { values, errors, defineField } = useForm();
 
 const {
   value: mobileNumber,
-  meta,
   errorMessage,
-} = useField("mobileLastThreeNumber", (value) => {
-  if (!value) {
-    return "手機未三碼必填";
-  }
-  if (value.length < 3) {
-    return "手機未三碼不足 3 位數";
-  }
-  if (value.length > 3) {
-    return "手機未三碼超過 3 位數";
-  }
-  return true;
-});
+
+  validate,
+  resetField,
+} = checkLastThreeDigits();
+
+function reSearch() {
+  resetField();
+  dialogModelRef.value.showModal();
+}
+
+async function searchMobile() {
+  await validate();
+  if (errorMessage.value) return;
+
+  console.log("OK");
+}
 </script>
 
 <template>
   <div class="w-auto h-[100dvh] flex justify-center items-center">
     <div class="text-center">
-      <!-- 輸入未三碼 -->
-      <inputPhoneLastThreeNumber
-        type="tel"
-        v-model="mobileNumber"
-        :errorMessage="errorMessage"
-      />
-      {{ meta.touched }}
       <h1 class="text-2xl font-bold">怪獸可麗餅</h1>
       <p class="flex justify-center">
         竹圍
@@ -59,7 +50,7 @@ const {
       </p>
 
       <div class="wait-info py-10">
-        <div v-if="!mobileValue">目前訂單份數:</div>
+        <div v-if="!mobileNumber">目前訂單份數:</div>
         <div v-else>您前面等候份數:</div>
         <div class="waiting-quantity text-5xl font-bold">006</div>
         <div>
@@ -68,16 +59,20 @@ const {
           分鐘
         </div>
       </div>
-      {{ mobileValue }}
+      {{ mobileNumber }}
       <button
-        v-show="!mobileValue"
+        v-if="!mobileNumber"
         onclick="my_modal_1.showModal()"
         class="btn btn-outline btn-info"
       >
         查詢我的進度
       </button>
 
-      <button @click="reSearch" class="btn btn-outline btn-info">
+      <button
+        v-else="mobileNumber"
+        @click="reSearch"
+        class="btn btn-outline btn-info"
+      >
         重新查詢
       </button>
 
@@ -97,6 +92,7 @@ const {
           ></path>
         </svg>
         <span class="text-xs">以上時間僅供參考，以現場狀況為主。</span>
+        {{ mobileNumber }}
       </div>
     </div>
 
@@ -104,21 +100,18 @@ const {
     <dialog ref="dialogModelRef" id="my_modal_1" class="modal">
       <div class="modal-box">
         <h3 class="font-bold text-lg">手機未三碼</h3>
-        <p class="py-4">
-          <!-- <input
-            ref="inputRef"
-            v-model="mobileValue"
-            type="tel"
-            placeholder="請輸入手機未三碼"
-            class="input input-bordered input-info w-full max-w-xs"
-            maxlength="3"
-          /> -->
-        </p>
+
+        <inputPhoneLastThreeNumber
+          type="tel"
+          v-model="mobileNumber"
+          :errorMessage="errorMessage"
+        />
+
         <div class="modal-action">
           <form method="dialog">
-            <button class="btn btn-error mr-4">取消</button>
-            <button class="btn btn-success">查詢</button>
+            <button @click="resetField" class="btn btn-error">取消</button>
           </form>
+          <button @click="searchMobile" class="btn btn-success">查詢</button>
         </div>
       </div>
     </dialog>
