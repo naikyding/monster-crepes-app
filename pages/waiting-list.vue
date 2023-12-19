@@ -2,6 +2,7 @@
 const dialogModelRef = ref(null);
 
 console.log(process.env.NODE_ENV);
+console.log(process.env.BASE_API_URL);
 
 const { pending, data, error, refresh } = await useFetch(
   `http://localhost:3000/v1/orders/waiting`,
