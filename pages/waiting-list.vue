@@ -1,8 +1,10 @@
 <script setup>
 const dialogModelRef = ref(null);
 
+console.log(process.env.NODE_ENV);
+
 const { pending, data, error, refresh } = await useFetch(
-  "http://localhost:3000/v1/orders/waiting",
+  `http://localhost:3000/v1/orders/waiting`,
   {
     lazy: false,
     server: true,
@@ -52,6 +54,7 @@ onMounted(() => {
   <Title>怪獸可麗餅 目前等待</Title>
   <div class="w-auto h-[100dvh] flex justify-center items-center">
     <div class="text-center">
+      {{}}
       <h1 class="text-2xl font-bold">怪獸可麗餅</h1>
       <p class="flex justify-center">
         竹圍
