@@ -1,11 +1,12 @@
 <script setup>
 const dialogModelRef = ref(null);
+const config = useRuntimeConfig();
 
-console.log(process.env.NODE_ENV);
-console.log(process.env.BASE_API_URL);
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`API URL: ${config.public.apiUrl}`);
 
 const { pending, data, error, refresh } = await useFetch(
-  `http://localhost:3000/v1/orders/waiting`,
+  `${config.public.apiUrl}/v1/orders/waiting`,
   {
     lazy: false,
     server: true,
