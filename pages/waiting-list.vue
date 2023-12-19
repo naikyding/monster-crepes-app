@@ -1,6 +1,17 @@
 <script setup>
 const dialogModelRef = ref(null);
 
+const { pending, data, error, refresh } = await useFetch(
+  "http://localhost:3000/v1/orders/waiting",
+  {
+    lazy: false,
+    server: true,
+    headers: {
+      "mc-agent-id": "64741f07778d6a978ef85f10",
+    },
+  }
+);
+
 const {
   value: mobileNumber,
   errorMessage,
@@ -8,6 +19,17 @@ const {
   validate,
   resetField,
 } = checkLastThreeDigits();
+
+const itemQuantity = computed(() =>
+  data.value?.data.itemQuantity >= 0 ? data.value?.data.itemQuantity : "--"
+);
+
+const range = computed(() => {
+  const time = data.value?.data?.range;
+  if (!time) return "--";
+  if (time.min === time.max) return time.min;
+  return `${time.min}~${time.max}`;
+});
 
 function reSearch() {
   resetField();
@@ -20,9 +42,14 @@ async function searchMobile() {
 
   console.log("OK");
 }
+
+onMounted(() => {
+  refresh();
+});
 </script>
 
 <template>
+  <Title>怪獸可麗餅 目前等待</Title>
   <div class="w-auto h-[100dvh] flex justify-center items-center">
     <div class="text-center">
       <h1 class="text-2xl font-bold">怪獸可麗餅</h1>
@@ -50,13 +77,23 @@ async function searchMobile() {
       </p>
 
       <div class="wait-info py-10">
-        <div v-if="!mobileNumber">目前訂單份數:</div>
-        <div v-else>您前面等候份數:</div>
-        <div class="waiting-quantity text-5xl font-bold">006</div>
-        <div>
-          預計等候
-          <span>30</span>
-          分鐘
+        <div v-if="pending" class="flex flex-col gap-4 w-full">
+          <div class="skeleton h-4 w-full"></div>
+          <div class="skeleton h-4 w-28"></div>
+        </div>
+
+        <div v-else>
+          <div v-if="!mobileNumber">目前訂單份數:</div>
+          <div v-else>您前面等候份數:</div>
+          <div class="waiting-quantity text-5xl font-bold">
+            {{ itemQuantity }}
+          </div>
+
+          <div class="mt-2">
+            預計等候
+            <span>{{ range }}</span>
+            分鐘
+          </div>
         </div>
       </div>
       {{ mobileNumber }}
@@ -92,16 +129,16 @@ async function searchMobile() {
           ></path>
         </svg>
         <span class="text-xs">以上時間僅供參考，以現場狀況為主。</span>
-        {{ mobileNumber }}
       </div>
     </div>
 
     <!-- Dialog -->
     <dialog ref="dialogModelRef" id="my_modal_1" class="modal">
-      <div class="modal-box">
+      <div class="modal-box w-auto sm:w-96">
         <h3 class="font-bold text-lg">手機未三碼</h3>
 
         <inputPhoneLastThreeNumber
+          class="py-4"
           type="tel"
           v-model="mobileNumber"
           :errorMessage="errorMessage"
