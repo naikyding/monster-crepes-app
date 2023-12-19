@@ -104,17 +104,20 @@ onMounted(() => {
       {{ mobileNumber }}
       <button
         v-if="!mobileNumber"
+        @click="refresh"
+        class="btn btn-outline btn-info"
+      >
+        刷新頁面
+      </button>
+      <button
+        v-if="false"
         onclick="my_modal_1.showModal()"
         class="btn btn-outline btn-info"
       >
         查詢我的進度
       </button>
 
-      <button
-        v-else="mobileNumber"
-        @click="reSearch"
-        class="btn btn-outline btn-info"
-      >
+      <button v-if="false" @click="reSearch" class="btn btn-outline btn-info">
         重新查詢
       </button>
 
