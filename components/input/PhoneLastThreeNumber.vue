@@ -16,7 +16,7 @@ const dynamicErrorStyle = computed(() => {
 <template>
   <div>
     <input
-      type="type || 'text'"
+      :type="type || 'text'"
       placeholder="請輸入手機未三碼"
       class="input input-bordered w-full"
       :class="[dynamicErrorStyle]"
