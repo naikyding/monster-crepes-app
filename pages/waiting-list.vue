@@ -94,7 +94,7 @@ onMounted(() => {
         <div v-else>
           <div v-if="!mobileNumber">目前候餐份數:</div>
           <div v-else>您前面等候份數:</div>
-          <div class="waiting-quantity text-5xl font-bold">
+          <div class="waiting-quantity text-5xl font-bold text-info">
             {{ itemQuantity }}
           </div>
 
