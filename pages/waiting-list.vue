@@ -82,8 +82,12 @@ onMounted(() => {
       </p>
 
       <div class="wait-info py-10">
-        <div v-if="pending" class="flex flex-col gap-4 w-full">
-          <div class="skeleton h-4 w-full"></div>
+        <div
+          v-if="pending || !data"
+          class="flex flex-col gap-4 items-center w-full"
+        >
+          <div class="skeleton h-4 w-28"></div>
+          <div class="skeleton h-10 w-10"></div>
           <div class="skeleton h-4 w-28"></div>
         </div>
 
@@ -104,11 +108,36 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      {{ mobileNumber }}
+
+      <!-- 查詢我的進度 -->
+      <button
+        onclick="my_modal_1.showModal()"
+        class="btn btn-info btn-block h-14"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          data-slot="icon"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+
+        查詢我的進度
+      </button>
+
+      <!-- 刷新 -->
       <button
         v-if="!mobileNumber"
         @click="refresh"
-        class="btn btn-outline btn-info"
+        class="btn btn-outline btn-info btn-block h-14 my-4"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -127,20 +156,13 @@ onMounted(() => {
         </svg>
         刷新頁面
       </button>
-      <button
-        v-if="false"
-        onclick="my_modal_1.showModal()"
-        class="btn btn-outline btn-info"
-      >
-        查詢我的進度
-      </button>
 
       <button v-if="false" @click="reSearch" class="btn btn-outline btn-info">
         重新查詢
       </button>
 
       <!-- 標語 -->
-      <div role="alert" class="alert py-2 mt-4 gap-2">
+      <div role="alert" class="alert py-2 gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -155,6 +177,7 @@ onMounted(() => {
           ></path>
         </svg>
         <span class="text-xs">以上時間僅供參考，以現場狀況為主。</span>
+        <span class="text-xs">頁面非即時更新，請刷新頁面</span>
       </div>
     </div>
 
