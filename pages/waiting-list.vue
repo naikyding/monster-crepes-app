@@ -81,11 +81,8 @@ onMounted(() => {
         </svg>
       </p>
 
-      <div class="wait-info py-10">
-        <div
-          v-if="pending || !data"
-          class="flex flex-col gap-4 items-center w-full"
-        >
+      <div class="wait-info py-10 w-full">
+        <div v-if="pending || !data" class="flex flex-col gap-4 items-center">
           <div class="skeleton h-4 w-28"></div>
           <div class="skeleton h-10 w-10"></div>
           <div class="skeleton h-4 w-28"></div>
@@ -132,37 +129,45 @@ onMounted(() => {
 
         查詢我的進度
       </button>
-
-      <!-- 刷新 -->
-      <button
-        v-if="!mobileNumber"
-        @click="refresh"
-        class="btn btn-outline btn-info btn-block h-14 my-4"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          data-slot="icon"
-          class="w-6 h-6"
+      <div>
+        <!-- 刷新 -->
+        <button
+          v-if="!mobileNumber"
+          @click="refresh"
+          class="btn btn-outline btn-info btn-block h-14 my-4"
+          :disabled="pending"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-          />
-        </svg>
-        刷新頁面
-      </button>
+          <template v-if="!pending">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              data-slot="icon"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+            刷新頁面
+          </template>
+
+          <template v-else>
+            <div class="loading loading-spinner" />
+          </template>
+        </button>
+      </div>
 
       <button v-if="false" @click="reSearch" class="btn btn-outline btn-info">
         重新查詢
       </button>
 
       <!-- 標語 -->
-      <div role="alert" class="alert py-2 gap-2">
+      <div role="alert" class="alert py-2 gap-2 w-full">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -183,7 +188,7 @@ onMounted(() => {
 
     <!-- Dialog -->
     <dialog ref="dialogModelRef" id="my_modal_1" class="modal">
-      <div class="modal-box w-auto sm:w-96">
+      <div class="modal-box w-11/12 sm:w-96">
         <h3 class="font-bold text-lg">手機未三碼</h3>
 
         <inputPhoneLastThreeNumber
