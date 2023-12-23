@@ -1,31 +1,36 @@
 <script setup>
 const dialogModelRef = ref(null);
 const config = useRuntimeConfig();
-
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-console.log(`API URL: ${config.public.apiUrl}`);
-
-const { pending, data, error, refresh } = await useFetch(
-  `${config.public.apiUrl}/v1/orders/waiting`,
-  {
-    lazy: false,
-    server: true,
-    headers: {
-      "mc-agent-id": "64741f07778d6a978ef85f10",
-    },
-  }
-);
+const mobileNumber = ref(null);
 
 const {
-  value: mobileNumber,
+  value: mobileLastNumber,
   errorMessage,
 
   validate,
   resetField,
 } = checkLastThreeDigits();
 
+const searchPendingList = (mobileNumber) =>
+  useFetch(
+    `${config.public.apiUrl}/v1/orders/waiting${
+      mobileNumber ? "?mobile=" + mobileNumber : ""
+    }`,
+    {
+      lazy: true,
+      server: true,
+      headers: {
+        "mc-agent-id": "64741f07778d6a978ef85f10",
+      },
+    }
+  );
+
+const { pending, data, refresh } = await searchPendingList();
+
+function researchData() {}
+
 const itemQuantity = computed(() =>
-  data.value?.data.itemQuantity >= 0 ? data.value?.data.itemQuantity : "--"
+  data.value?.data?.itemQuantity >= 0 ? data.value?.data?.itemQuantity : "--"
 );
 
 const range = computed(() => {
@@ -40,11 +45,24 @@ function reSearch() {
   dialogModelRef.value.showModal();
 }
 
-async function searchMobile() {
+async function searchMobile(mobileLastNumber) {
   await validate();
   if (errorMessage.value) return;
 
-  console.log("OK");
+  pending.value = true;
+
+  const {
+    pending: { value: newPending },
+    data: { value: newData },
+    refresh: { value: newRefresh },
+  } = await searchPendingList(mobileLastNumber.value);
+
+  data.value = newData;
+  pending.value = newPending;
+  refresh.value = newRefresh;
+
+  mobileNumber.value = mobileLastNumber.value;
+  resetField();
 }
 
 onMounted(() => {
@@ -56,7 +74,6 @@ onMounted(() => {
   <Title>怪獸可麗餅 | 候餐時間</Title>
   <div class="w-auto h-[100dvh] flex justify-center items-center">
     <div class="text-center">
-      {{}}
       <h1 class="text-2xl font-bold">怪獸可麗餅</h1>
       <p class="flex justify-center">
         竹圍
@@ -90,13 +107,25 @@ onMounted(() => {
 
         <div v-else>
           <div v-if="!mobileNumber">目前候餐份數:</div>
-          <div v-else>您前面等候份數:</div>
+          <div v-else>
+            <h3>您的未三碼:</h3>
+            <p class="waiting-quantity text-5xl font-bold text-info my-4">
+              <span
+                class="border rounded-lg px-3 mx-1"
+                v-for="item in mobileNumber.split('')"
+              >
+                {{ item }}
+              </span>
+            </p>
+            您前面等候份數:
+          </div>
           <div class="waiting-quantity text-5xl font-bold text-info">
             {{ itemQuantity }}
           </div>
 
           <div v-if="range === 0 || itemQuantity === 1" class="mt-2">
-            不用等候
+            <span v-if="mobileNumber">製作中</span>
+            <span v-else>不用等候</span>
           </div>
           <div v-else class="mt-2">
             預計等候約
@@ -132,7 +161,6 @@ onMounted(() => {
       <div>
         <!-- 刷新 -->
         <button
-          v-if="!mobileNumber"
           @click="refresh"
           class="btn btn-outline btn-info btn-block h-14 my-4"
           :disabled="pending"
@@ -194,15 +222,21 @@ onMounted(() => {
         <inputPhoneLastThreeNumber
           class="py-4"
           type="tel"
-          v-model="mobileNumber"
+          inputmode="numeric"
+          v-model="mobileLastNumber"
           :errorMessage="errorMessage"
         />
 
         <div class="modal-action">
           <form method="dialog">
             <button @click="resetField" class="btn btn-error">取消</button>
+            <button
+              @click="searchMobile(ref(mobileLastNumber))"
+              class="btn btn-success"
+            >
+              查詢
+            </button>
           </form>
-          <button @click="searchMobile" class="btn btn-success">查詢</button>
         </div>
       </div>
     </dialog>
