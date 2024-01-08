@@ -1,4 +1,5 @@
 <script setup>
+import { checkLastThreeDigits } from "../utils/validation";
 const dialogModelRef = ref(null);
 const config = useRuntimeConfig();
 const mobileNumber = ref(null);
