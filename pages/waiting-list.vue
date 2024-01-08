@@ -12,22 +12,16 @@ const {
 } = checkLastThreeDigits();
 
 const searchPendingList = (mobileNumber) =>
-  useFetch(
-    `${config.public.apiUrl}/v1/orders/waiting${
-      mobileNumber ? "?mobile=" + mobileNumber : ""
-    }`,
-    {
-      lazy: true,
-      server: true,
-      headers: {
-        "mc-agent-id": "64741f07778d6a978ef85f10",
-      },
-    }
-  );
+  useFetch(`${config.public.apiUrl}/v1/orders/waiting`, {
+    query: { mobile: mobileNumber },
+    lazy: true,
+    server: true,
+    headers: {
+      "mc-agent-id": "64741f07778d6a978ef85f10",
+    },
+  });
 
 const { pending, data, refresh } = await searchPendingList();
-
-function researchData() {}
 
 const itemQuantity = computed(() =>
   data.value?.data?.itemQuantity >= 0 ? data.value?.data?.itemQuantity : "--"
@@ -40,15 +34,17 @@ const range = computed(() => {
   return `${time.min}~${time.max}`;
 });
 
-function reSearch() {
-  resetField();
-  dialogModelRef.value.showModal();
-}
-
 async function searchMobile(mobileLastNumber) {
   await validate();
   if (errorMessage.value) return;
 
+  await reFetch(mobileLastNumber);
+
+  mobileNumber.value = mobileLastNumber.value;
+  resetField();
+}
+
+async function reFetch(mobileLastNumber) {
   pending.value = true;
 
   const {
@@ -60,9 +56,16 @@ async function searchMobile(mobileLastNumber) {
   data.value = newData;
   pending.value = newPending;
   refresh.value = newRefresh;
+}
 
-  mobileNumber.value = mobileLastNumber.value;
-  resetField();
+// 刷新頁面
+function reSearchData(mobileNumber) {
+  mobileNumber.value ? reFetch(mobileNumber) : refresh();
+}
+
+function resetSearch() {
+  mobileNumber.value = null;
+  refresh();
 }
 
 onMounted(() => {
@@ -98,7 +101,7 @@ onMounted(() => {
         </svg>
       </p>
 
-      <div class="wait-info py-10 w-full">
+      <div class="wait-info py-4 w-full">
         <div v-if="pending || !data" class="flex flex-col gap-4 items-center">
           <div class="skeleton h-4 w-28"></div>
           <div class="skeleton h-10 w-10"></div>
@@ -106,9 +109,9 @@ onMounted(() => {
         </div>
 
         <div v-else>
-          <div v-if="!mobileNumber">目前候餐份數:</div>
+          <div v-if="!mobileNumber">目前候餐數量:</div>
           <div v-else>
-            <h3>您的未三碼:</h3>
+            <h3>未三碼</h3>
             <p class="waiting-quantity text-5xl font-bold text-info my-4">
               <span
                 class="border rounded-lg px-3 mx-1"
@@ -117,7 +120,7 @@ onMounted(() => {
                 {{ item }}
               </span>
             </p>
-            您前面等候份數:
+            候餐數量:
           </div>
           <div class="waiting-quantity text-5xl font-bold text-info">
             {{ itemQuantity }}
@@ -155,13 +158,12 @@ onMounted(() => {
             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
           />
         </svg>
-
         查詢我的進度
       </button>
       <div>
         <!-- 刷新 -->
         <button
-          @click="refresh"
+          @click="reSearchData(ref(mobileNumber))"
           class="btn btn-outline btn-info btn-block h-14 my-4"
           :disabled="pending"
         >
@@ -190,12 +192,12 @@ onMounted(() => {
         </button>
       </div>
 
-      <button v-if="false" @click="reSearch" class="btn btn-outline btn-info">
+      <button @click="resetSearch" class="btn btn-outline btn-info">
         重新查詢
       </button>
 
       <!-- 標語 -->
-      <div role="alert" class="alert py-2 gap-2 w-full">
+      <div role="alert" class="alert py-2 gap-2 w-full mt-4">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
