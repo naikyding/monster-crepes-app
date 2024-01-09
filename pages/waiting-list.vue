@@ -37,6 +37,8 @@ async function searchMobile(mobileLastNumber) {
   await validate();
   if (errorMessage.value) return;
 
+  dialogModelRef.value.close();
+
   await reFetch(mobileLastNumber);
 
   mobileNumber.value = mobileLastNumber.value;
@@ -101,15 +103,16 @@ onMounted(() => {
       </p>
 
       <div class="wait-info py-4 w-full">
+        <!-- loading 骨架 -->
         <div v-if="pending || !data" class="flex flex-col gap-4 items-center">
           <div class="skeleton h-4 w-28"></div>
           <div class="skeleton h-10 w-10"></div>
           <div class="skeleton h-4 w-28"></div>
         </div>
 
+        <!-- loading DONE -->
         <div v-else>
-          <div v-if="!mobileNumber">目前候餐數量:</div>
-          <div v-else>
+          <div v-if="mobileNumber">
             <h3>未三碼</h3>
             <p class="waiting-quantity text-5xl font-bold text-info my-4">
               <span
@@ -119,26 +122,36 @@ onMounted(() => {
                 {{ item }}
               </span>
             </p>
-            候餐數量:
-          </div>
-          <div class="waiting-quantity text-5xl font-bold text-info">
-            {{ itemQuantity }}
           </div>
 
-          <div v-if="range === 0 || itemQuantity === 1" class="mt-2">
-            <span v-if="mobileNumber">製作中</span>
-            <span v-else>不用等候</span>
+          <div v-if="typeof data.data === 'string'">
+            {{ data.data }}
           </div>
-          <div v-else class="mt-2">
-            預計等候約
-            <span>{{ range }}</span>
-            分鐘
+
+          <div v-else>
+            目前候餐數量
+            <!-- 候餐數量 -->
+            <div class="waiting-quantity text-5xl font-bold text-info">
+              {{ itemQuantity }}
+            </div>
+
+            <!-- 等候時間 -->
+            <div v-if="range === 0 || itemQuantity === 1" class="mt-2">
+              <span v-if="mobileNumber">製作中</span>
+              <span v-else>不用等候</span>
+            </div>
+            <div v-else class="mt-2">
+              預計等候約
+              <span>{{ range }}</span>
+              分鐘
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 查詢我的進度 -->
       <button
+        v-show="!mobileNumber"
         onclick="my_modal_1.showModal()"
         class="btn btn-info btn-block h-14"
       >
@@ -159,11 +172,44 @@ onMounted(() => {
         </svg>
         查詢我的進度
       </button>
-      <div>
+
+      <!-- 重新查詢 -->
+      <button
+        v-show="mobileNumber"
+        :disabled="pending"
+        @click="resetSearch"
+        class="btn btn-info btn-block h-14"
+      >
+        <template v-if="!pending">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            data-slot="icon"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            />
+          </svg>
+          查詢現場候餐
+        </template>
+
+        <template v-else>
+          <div class="loading loading-spinner" />
+        </template>
+      </button>
+
+      <!-- 刷新頁面 -->
+      <div class="my-4">
         <!-- 刷新 -->
         <button
           @click="reSearchData(ref(mobileNumber))"
-          class="btn btn-outline btn-info btn-block h-14 my-4"
+          class="btn btn-outline btn-info btn-block h-14"
           :disabled="pending"
         >
           <template v-if="!pending">
@@ -191,11 +237,7 @@ onMounted(() => {
         </button>
       </div>
 
-      <button @click="resetSearch" class="btn btn-outline btn-info">
-        重新查詢
-      </button>
-
-      <!-- 標語 -->
+      <!-- 說明標語 -->
       <div role="alert" class="alert py-2 gap-2 w-full mt-4">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -231,13 +273,13 @@ onMounted(() => {
         <div class="modal-action">
           <form method="dialog">
             <button @click="resetField" class="btn btn-error">取消</button>
-            <button
-              @click="searchMobile(ref(mobileLastNumber))"
-              class="btn btn-success"
-            >
-              查詢
-            </button>
           </form>
+          <button
+            @click="searchMobile(ref(mobileLastNumber))"
+            class="btn btn-success"
+          >
+            查詢
+          </button>
         </div>
       </div>
     </dialog>
