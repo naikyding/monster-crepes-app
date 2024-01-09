@@ -15,6 +15,7 @@ const searchPendingList = (mobileNumber) =>
   useFetch(`${config.public.apiUrl}/v1/orders/waiting`, {
     query: { mobile: mobileNumber },
     lazy: true,
+    server: false,
     headers: {
       "mc-agent-id": "64741f07778d6a978ef85f10",
     },
