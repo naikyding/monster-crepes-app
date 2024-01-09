@@ -1,5 +1,4 @@
 <script setup>
-import { checkLastThreeDigits } from "../utils/validation";
 const dialogModelRef = ref(null);
 const config = useRuntimeConfig();
 const mobileNumber = ref(null);
@@ -16,7 +15,6 @@ const searchPendingList = (mobileNumber) =>
   useFetch(`${config.public.apiUrl}/v1/orders/waiting`, {
     query: { mobile: mobileNumber },
     lazy: true,
-    server: true,
     headers: {
       "mc-agent-id": "64741f07778d6a978ef85f10",
     },
