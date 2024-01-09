@@ -1,5 +1,6 @@
 import { useField } from "vee-validate";
-import { isNumeric, isLength } from "validator";
+import validator from "validator";
+const { isNumeric, isLength } = validator;
 
 // 手機未三碼
 const checkLastThreeDigits = (inputName) =>
