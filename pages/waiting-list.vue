@@ -9,7 +9,7 @@ const {
 
   validate,
   resetField,
-} = validation.checkLastThreeDigits();
+} = checkLastThreeDigits();
 
 const searchPendingList = (mobileNumber) =>
   useFetch(`${config.public.apiUrl}/v1/orders/waiting`, {

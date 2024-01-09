@@ -3,7 +3,7 @@ import validator from "validator";
 const { isNumeric, isLength } = validator;
 
 // 手機未三碼
-const checkLastThreeDigits = (inputName) =>
+export const checkLastThreeDigits = (inputName) =>
   useField(inputName || "last3Digits", (mobileLast3Number) => {
     if (!mobileLast3Number) return "手機未三碼必填";
     if (!isNumeric(mobileLast3Number)) return "請輸入數字格式";
@@ -12,7 +12,3 @@ const checkLastThreeDigits = (inputName) =>
 
     return true;
   });
-
-export default {
-  checkLastThreeDigits,
-};
