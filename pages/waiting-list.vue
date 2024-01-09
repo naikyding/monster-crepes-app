@@ -153,6 +153,7 @@ onMounted(() => {
       <button
         v-show="!mobileNumber"
         onclick="my_modal_1.showModal()"
+        :disabled="pending"
         class="btn btn-info btn-block h-14"
       >
         <svg
