@@ -33,6 +33,13 @@ const range = computed(() => {
   return `${time.min}~${time.max}`;
 });
 
+function formatRange(range) {
+  if (range.min && range.max) {
+    return `${range.min}~${range.max}`;
+  }
+  return "--";
+}
+
 async function searchMobile(mobileLastNumber) {
   await validate();
   if (errorMessage.value) return;
@@ -69,14 +76,21 @@ function resetSearch() {
   refresh();
 }
 
+const pendingWidth = (pendingLength, completedLength) =>
+  pendingLength > 1 || completedLength > 0 ? "w-9/12" : "w-full";
+
+const completedWidth = (completedLength) =>
+  completedLength > 0 ? "w-9/12" : "w-full";
+
 onMounted(() => {
   refresh();
 });
 </script>
 
 <template>
+  <div class="px-6"></div>
   <Title>怪獸可麗餅 | 候餐時間</Title>
-  <div class="w-auto h-[100dvh] flex justify-center items-center">
+  <div class="w-auto h-[100dvh] flex justify-center items-center px-12">
     <div class="text-center">
       <h1 class="text-2xl font-bold">怪獸可麗餅</h1>
       <p class="flex justify-center">
@@ -114,21 +128,26 @@ onMounted(() => {
         <div v-else>
           <div v-if="mobileNumber">
             <h3>未三碼</h3>
-            <p class="waiting-quantity text-5xl font-bold text-info my-4">
-              <span
-                class="border rounded-lg px-3 mx-1"
-                v-for="item in mobileNumber.split('')"
-              >
-                {{ item }}
-              </span>
+            <p class="waiting-quantity text-5xl font-bold text-info mb-1">
+              {{ mobileNumber }}
             </p>
+            <span
+              v-show="
+                pendingWidth(
+                  data?.data?.pending?.length,
+                  data?.data?.completed?.length
+                ) === 'w-9/12'
+              "
+              class="text-xs text-error"
+              >**有相同的未三碼，請確認您的「點餐時間」**</span
+            >
           </div>
 
           <div v-if="typeof data.data === 'string'">
             {{ data.data }}
           </div>
 
-          <div v-else>
+          <div class="bg-neutral rounded-box py-4" v-if="false">
             目前候餐數量
             <!-- 候餐數量 -->
             <div class="waiting-quantity text-5xl font-bold text-info">
@@ -141,9 +160,78 @@ onMounted(() => {
               <span v-else>不用等候</span>
             </div>
             <div v-else class="mt-2">
-              預計等候約
-              <span>{{ range }}</span>
+              等候約
+              <span class="text-info">{{ range }}</span>
               分鐘
+            </div>
+          </div>
+
+          <!-- 跑馬 -->
+          <div class="carousel w-full space-x-4">
+            <!-- 等待中 -->
+            <div
+              v-for="item in data?.data.pending"
+              class="carousel-item flex justify-center items-center bg-neutral rounded-2xl py-4"
+              :class="[
+                pendingWidth(
+                  data?.data?.pending?.length,
+                  data?.data?.completed?.length
+                ),
+              ]"
+            >
+              <div>
+                <p class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1">
+                  點餐時間: {{ dayFormat(item.createdAt, "MM/DD mm:ss") }}
+                </p>
+                目前候餐數量
+                <!-- 候餐數量 -->
+                <div class="waiting-quantity text-5xl font-bold text-info">
+                  {{ item.itemsQuantity }}
+                </div>
+
+                <!-- 等候時間 -->
+                <div
+                  v-if="item.range.min === 0 || item.itemsQuantity === 1"
+                  class="mt-2"
+                >
+                  <span v-if="mobileNumber">製作中...</span>
+                  <span v-else>不用等候</span>
+                </div>
+                <div v-else class="mt-2">
+                  等候約
+                  <span class="text-info">{{ formatRange(item.range) }}</span>
+                  分鐘
+                </div>
+              </div>
+            </div>
+            <!-- 已完成 -->
+            <div
+              v-for="item in data?.data.completed"
+              class="carousel-item flex justify-center items-center bg-neutral rounded-2xl"
+              :class="[completedWidth(data?.data?.completed?.length)]"
+            >
+              <div>
+                <p class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1">
+                  點餐時間: {{ dayFormat(item.createdAt, "MM/DD mm:ss") }}
+                </p>
+                <h3 class="mb-4 text-3xl font-bold text-info">已完成</h3>
+                <p class="text-xs">
+                  完成時間: {{ dayFormat(item.updatedAt, "MM/DD mm:ss") }}
+                </p>
+                <!-- 候餐數量 -->
+                <div class="waiting-quantity text-5xl font-bold text-info">
+                  {{ item.itemsQuantity }}
+                </div>
+
+                <!-- 等候時間 -->
+                <div
+                  v-if="range.min === 0 || item.itemQuantity === 1"
+                  class="mt-2"
+                >
+                  <span v-if="mobileNumber">製作中</span>
+                  <span v-else>不用等候</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -254,7 +342,7 @@ onMounted(() => {
           ></path>
         </svg>
         <span class="text-xs">以上時間僅供參考，以現場狀況為主。</span>
-        <span class="text-xs">頁面非即時更新，請刷新頁面</span>
+        <span class="text-xs">頁面非即時更新，請刷新頁面。</span>
       </div>
     </div>
 
