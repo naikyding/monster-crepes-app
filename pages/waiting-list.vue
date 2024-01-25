@@ -80,7 +80,15 @@ const pendingWidth = (pendingLength, completedLength) =>
   pendingLength > 1 || completedLength > 0 ? "w-9/12" : "w-full";
 
 const completedWidth = (completedLength) =>
-  completedLength > 0 ? "w-9/12" : "w-full";
+  completedLength > 1 ? "w-9/12" : "w-full";
+
+const showSameNumberDescription = (pendingLength, completedLength) => {
+  if (pendingLength > 1) return true;
+  if (completedLength > 1) return true;
+  if (pendingLength > 0 && completedLength > 0) return true;
+
+  return false;
+};
 
 onMounted(() => {
   refresh();
@@ -131,10 +139,10 @@ onMounted(() => {
             </p>
             <span
               v-show="
-                pendingWidth(
+                showSameNumberDescription(
                   data?.data?.pending?.length,
                   data?.data?.completed?.length
-                ) === 'w-9/12'
+                )
               "
               class="text-xs text-error"
               >**有相同的未三碼，請確認您的「點餐時間」**</span
@@ -183,7 +191,7 @@ onMounted(() => {
                   class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1"
                 >
                   點餐時間:
-                  {{ dayFormat(item.content.createdAt, "MM/DD hh:mm") }}
+                  {{ dayFormat(item.content.createdAt, "MM/DD HH:mm") }}
                 </p>
                 目前候餐數量
                 <!-- 候餐數量 -->
@@ -209,18 +217,18 @@ onMounted(() => {
             <!-- 已完成 -->
             <div
               v-for="item in data?.data.completed"
-              class="carousel-item flex justify-center items-center bg-neutral rounded-2xl"
+              class="carousel-item flex justify-center items-center bg-neutral rounded-2xl py-4"
               :class="[completedWidth(data?.data?.completed?.length)]"
             >
               <div>
                 <p class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1">
                   點餐時間:
-                  {{ dayFormat(item.createdAt, "MM/DD hh:mm") }}
+                  {{ dayFormat(item.createdAt, "MM/DD HH:mm") }}
                 </p>
                 <h3 class="mb-4 text-3xl font-bold text-info">已完成</h3>
                 <p class="text-xs">
                   完成時間:
-                  {{ dayFormat(item.updatedAt, "MM/DD hh:mm") }}
+                  {{ dayFormat(item.updatedAt, "MM/DD HH:mm") }}
                 </p>
                 <!-- 候餐數量 -->
                 <div class="waiting-quantity text-5xl font-bold text-info">
