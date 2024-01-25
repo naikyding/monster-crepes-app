@@ -119,9 +119,7 @@ onMounted(() => {
       <div class="wait-info py-4 w-full">
         <!-- loading 骨架 -->
         <div v-if="pending || !data" class="flex flex-col gap-4 items-center">
-          <div class="skeleton h-4 w-28"></div>
-          <div class="skeleton h-10 w-10"></div>
-          <div class="skeleton h-4 w-28"></div>
+          <div class="skeleton h-40 w-full"></div>
         </div>
 
         <!-- loading DONE -->
@@ -180,8 +178,12 @@ onMounted(() => {
               ]"
             >
               <div>
-                <p class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1">
-                  點餐時間: {{ dayFormat(item.createdAt, "MM/DD mm:ss") }}
+                <p
+                  v-if="item.content"
+                  class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1"
+                >
+                  點餐時間:
+                  {{ dayFormat(item.content.createdAt, "MM/DD hh:mm") }}
                 </p>
                 目前候餐數量
                 <!-- 候餐數量 -->
@@ -212,11 +214,13 @@ onMounted(() => {
             >
               <div>
                 <p class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1">
-                  點餐時間: {{ dayFormat(item.createdAt, "MM/DD mm:ss") }}
+                  點餐時間:
+                  {{ dayFormat(item.createdAt, "MM/DD hh:mm") }}
                 </p>
                 <h3 class="mb-4 text-3xl font-bold text-info">已完成</h3>
                 <p class="text-xs">
-                  完成時間: {{ dayFormat(item.updatedAt, "MM/DD mm:ss") }}
+                  完成時間:
+                  {{ dayFormat(item.updatedAt, "MM/DD hh:mm") }}
                 </p>
                 <!-- 候餐數量 -->
                 <div class="waiting-quantity text-5xl font-bold text-info">
