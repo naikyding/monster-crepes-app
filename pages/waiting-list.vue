@@ -119,7 +119,7 @@ onMounted(() => {
       <div class="wait-info py-4 w-full">
         <!-- loading 骨架 -->
         <div v-if="pending || !data" class="flex flex-col gap-4 items-center">
-          <div class="skeleton h-40 w-full"></div>
+          <div class="skeleton h-36 w-full"></div>
         </div>
 
         <!-- loading DONE -->
