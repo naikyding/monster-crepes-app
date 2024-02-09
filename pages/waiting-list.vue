@@ -193,7 +193,7 @@ onMounted(() => {
                   點餐時間:
                   {{ dayFormat(item.content.createdAt, "MM/DD HH:mm") }}
                 </p>
-                <span class="text-white"> 目前候餐數量</span>
+                <span> 目前候餐數量</span>
                 <!-- 候餐數量 -->
                 <div class="waiting-quantity text-5xl font-bold text-info">
                   {{ item.itemsQuantity }}
@@ -207,7 +207,7 @@ onMounted(() => {
                   <span v-if="mobileNumber">製作中...</span>
                   <span v-else>不用等候</span>
                 </div>
-                <div v-else class="mt-2 text-white">
+                <div v-else class="mt-2">
                   等候約
                   <span class="text-info">{{ formatRange(item.range) }}</span>
                   分鐘
@@ -339,7 +339,7 @@ onMounted(() => {
       </div>
 
       <!-- 說明標語 -->
-      <div role="alert" class="alert py-2 gap-2 w-full mt-4 text-white">
+      <div role="alert" class="alert py-2 gap-2 w-full mt-4">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -361,7 +361,7 @@ onMounted(() => {
     <!-- Dialog -->
     <dialog ref="dialogModelRef" id="my_modal_1" class="modal">
       <div class="modal-box w-11/12 sm:w-96">
-        <h3 class="font-bold text-white text-lg">手機未三碼</h3>
+        <h3 class="font-bold text-lg">手機未三碼</h3>
 
         <inputPhoneLastThreeNumber
           class="py-4"
