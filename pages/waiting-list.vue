@@ -133,7 +133,7 @@ onMounted(() => {
         <!-- loading DONE -->
         <div v-else>
           <div v-if="mobileNumber">
-            <h3>未三碼</h3>
+            <h3>末三碼</h3>
             <p class="waiting-quantity text-5xl font-bold text-info mb-1">
               {{ mobileNumber }}
             </p>
