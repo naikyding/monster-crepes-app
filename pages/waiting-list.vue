@@ -145,7 +145,7 @@ onMounted(() => {
                 )
               "
               class="text-xs text-error"
-              >**有相同的未三碼，請確認您的「點餐時間」**</span
+              >**有相同的末三碼，請確認您的「點餐時間」**</span
             >
           </div>
 
@@ -361,7 +361,7 @@ onMounted(() => {
     <!-- Dialog -->
     <dialog ref="dialogModelRef" id="my_modal_1" class="modal">
       <div class="modal-box w-11/12 sm:w-96">
-        <h3 class="font-bold text-lg">手機未三碼</h3>
+        <h3 class="font-bold text-lg">手機末三碼</h3>
 
         <inputPhoneLastThreeNumber
           class="py-4"
