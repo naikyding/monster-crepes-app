@@ -82,9 +82,14 @@ const pendingWidth = (pendingLength, completedLength) =>
 const completedWidth = (completedLength) =>
   completedLength > 1 ? "w-9/12" : "w-full";
 
-const showSameNumberDescription = (pendingLength, completedLength) => {
+const showSameNumberDescription = (
+  pendingLength,
+  completedLength,
+  readyForPickup
+) => {
   if (pendingLength > 1) return true;
   if (completedLength > 1) return true;
+  if (readyForPickup > 1) return true;
   if (pendingLength > 0 && completedLength > 0) return true;
 
   return false;
@@ -141,7 +146,8 @@ onMounted(() => {
               v-show="
                 showSameNumberDescription(
                   data?.data?.pending?.length,
-                  data?.data?.completed?.length
+                  data?.data?.completed?.length,
+                  data?.data?.readyForPickup?.length
                 )
               "
               class="text-xs text-error"
@@ -245,6 +251,38 @@ onMounted(() => {
                 </div>
               </div>
             </div>
+            <!-- 待取餐 -->
+
+            <div
+              v-for="item in data?.data.readyForPickup"
+              class="carousel-item flex justify-center items-center bg-neutral rounded-2xl py-4"
+              :class="[completedWidth(data?.data?.completed?.length)]"
+            >
+              <div>
+                <p class="text-xs mb-2 bg-info rounded-xl text-black px-4 py-1">
+                  點餐時間:
+                  {{ dayFormat(item.createdAt, "MM/DD HH:mm") }}
+                </p>
+                <h3 class="mb-4 text-3xl font-bold text-info">已完成 online</h3>
+                <p class="text-xs">
+                  完成時間:
+                  {{ dayFormat(item.updatedAt, "MM/DD HH:mm") }}
+                </p>
+                <!-- 候餐數量 -->
+                <div class="waiting-quantity text-5xl font-bold text-info">
+                  {{ item.itemsQuantity }}
+                </div>
+
+                <!-- 等候時間 -->
+                <div
+                  v-if="range.min === 0 || item.itemQuantity === 1"
+                  class="mt-2"
+                >
+                  <span v-if="mobileNumber">製作中</span>
+                  <span v-else>不用等候</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -329,7 +367,7 @@ onMounted(() => {
                 d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
               />
             </svg>
-            刷新頁面
+            刷新頁面 (更新狀態)
           </template>
 
           <template v-else>
