@@ -10,20 +10,22 @@ const {
   validate,
   resetField,
 } = checkLastThreeDigits();
+const route = useRoute();
+
+const agentId = computed(() => {
+  return route.query.agent || null;
+});
 
 const searchPendingList = (mobileNumber) =>
   useFetch(`${config.public.apiUrl}/v1/orders/waiting`, {
-    query: { mobile: mobileNumber },
+    query: { mobile: mobileNumber, agent: agentId.value },
     lazy: true,
-    headers: {
-      "mc-agent-id": "64741f07778d6a978ef85f10",
-    },
   });
 
 const { pending, data, refresh } = await searchPendingList();
 
 const itemQuantity = computed(() =>
-  data.value?.data?.itemQuantity >= 0 ? data.value?.data?.itemQuantity : "--"
+  data.value?.data?.itemQuantity >= 0 ? data.value?.data?.itemQuantity : "--",
 );
 
 const range = computed(() => {
@@ -85,7 +87,7 @@ const completedWidth = (completedLength) =>
 const showSameNumberDescription = (
   pendingLength,
   completedLength,
-  readyForPickup
+  readyForPickup,
 ) => {
   if (pendingLength > 1) return true;
   if (completedLength > 1) return true;
@@ -96,15 +98,21 @@ const showSameNumberDescription = (
 };
 
 onMounted(() => {
+  if (!agentId.value) {
+    // 沒有 agent，不執行查詢
+    return;
+  }
+
   refresh();
 });
 </script>
 
 <template>
-  <div class="px-6"></div>
   <Title>怪獸可麗餅 | 候餐時間</Title>
   <div class="w-auto h-[100dvh] flex justify-center items-center px-12">
-    <div class="text-center">
+    <div v-if="!agentId">無效的候餐網址，請從店家提供的候餐連結進入!</div>
+
+    <div v-else class="text-center">
       <h1 class="text-2xl font-bold">怪獸可麗餅</h1>
       <p class="flex justify-center">
         竹圍
@@ -147,7 +155,7 @@ onMounted(() => {
                 showSameNumberDescription(
                   data?.data?.pending?.length,
                   data?.data?.completed?.length,
-                  data?.data?.readyForPickup?.length
+                  data?.data?.readyForPickup?.length,
                 )
               "
               class="text-xs text-error"
@@ -187,7 +195,7 @@ onMounted(() => {
               :class="[
                 pendingWidth(
                   data?.data?.pending?.length,
-                  data?.data?.completed?.length
+                  data?.data?.completed?.length,
                 ),
               ]"
             >
@@ -207,13 +215,13 @@ onMounted(() => {
 
                 <!-- 等候時間 -->
                 <div
-                  v-if="item.range.min === 0 || item.itemsQuantity === 1"
+                  v-if="item.range.min === 0 || item.itemsQuantity < 1"
                   class="mt-2"
                 >
                   <span v-if="mobileNumber">製作中...</span>
                   <span v-else>不用等候</span>
                 </div>
-                <div v-else class="mt-2">
+                <div class="mt-2">
                   等候約
                   <span class="text-info">{{ formatRange(item.range) }}</span>
                   分鐘
@@ -243,7 +251,7 @@ onMounted(() => {
 
                 <!-- 等候時間 -->
                 <div
-                  v-if="range.min === 0 || item.itemQuantity === 1"
+                  v-if="range.min === 0 || item.itemQuantity < 1"
                   class="mt-2"
                 >
                   <span v-if="mobileNumber">製作中</span>
@@ -275,7 +283,7 @@ onMounted(() => {
 
                 <!-- 等候時間 -->
                 <div
-                  v-if="range.min === 0 || item.itemQuantity === 1"
+                  v-if="range.min === 0 || item.itemQuantity < 1"
                   class="mt-2"
                 >
                   <span v-if="mobileNumber">製作中</span>
@@ -424,5 +432,3 @@ onMounted(() => {
     </dialog>
   </div>
 </template>
-
-<style scoped></style>
